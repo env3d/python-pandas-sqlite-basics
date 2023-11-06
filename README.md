@@ -145,5 +145,7 @@ count_jobs_sqlite()
 Now is a good time to learn some SQL basics, complete the following tutorials:
 
 https://sqlzoo.net/wiki/SELECT_basics
+
 https://sqlzoo.net/wiki/SELECT_from_WORLD_Tutorial
+
 https://sqlzoo.net/wiki/SELECT_from_Nobel_Tutorial
