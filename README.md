@@ -80,7 +80,6 @@ def write_to_sqlite():
     for df in chunks:
         df.to_sql('principals', conn, if_exists='append')
 
-write_to_sqlite()
 ```
 
 After the above code is executed (will have to wait a few minutes), the file
@@ -130,13 +129,10 @@ archive_sound
 We can actually execute SQL from pandas, like this:
 
 ```
-def count_jobs_sqlite():
-    chunks = pd.read_csv('title.principals.tsv', delimiter='\t', chunksize=50000)
+def count_jobs_sql():
     conn = sqlite3.connect('imdb.db')
-    for df in chunks:
-        df.to_sql('principals', conn, if_exists='append')
-
-count_jobs_sqlite()
+    df = pd.read_sql('select distinct(category) from principals', conn)
+    return df
 
 ```
 
