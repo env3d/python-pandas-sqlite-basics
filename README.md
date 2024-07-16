@@ -9,7 +9,7 @@ Details of the dataset can be found at https://developer.imdb.com/non-commercial
 You can download the complete dataset as follows, these data files are in compressed
 format, so we uncompress them using the gunzip command at the end:
 
-```
+```bash
 wget https://datasets.imdbws.com/name.basics.tsv.gz
 wget https://datasets.imdbws.com/title.akas.tsv.gz
 wget https://datasets.imdbws.com/title.basics.tsv.gz
@@ -44,7 +44,7 @@ The file title.principals.tsv list out all the major workers for each
 of the entertainment titles.  Write 2 python functions using the csv
 technique and the pandas technique to extract all the unique job categories.
 
-```
+```python
 def count_jobs():
     chunks = pd.read_csv('title.principals.tsv', delimiter='\t', chunksize=50000)
 
@@ -70,7 +70,7 @@ Pandas has built-in ability to work with SQL databases.  The following
 python code will read all data from title.principals.tsv and write it to
 a file called imdb.db:
 
-```
+```python
 import pandas
 import sqlite3
 
@@ -86,7 +86,7 @@ After the above code is executed (will have to wait a few minutes), the file
 imdb.db will be created in your working directory.  You can inspect the
 imdb.db database using the `sqlite3` command in the bash shell:
 
-```
+```console
 $ sqlite3 imdb.db
 SQLite version 3.37.2 2022-01-06 13:25:41
 Enter ".help" for usage hints.
@@ -110,7 +110,7 @@ we created from the python code.
 The following SQL command (we actually call it SQL Query) will retrieve
 all unique job categories:
 
-```
+```sql
 sqlite> select distinct(category) from principals;
 self
 director
@@ -128,7 +128,7 @@ archive_sound
 
 We can actually execute SQL from pandas, like this:
 
-```
+```python
 def count_jobs_sql():
     conn = sqlite3.connect('imdb.db')
     df = pd.read_sql('select distinct(category) from principals', conn)
