@@ -6,18 +6,68 @@ Create a working directory and download the IMDB non-commerical dataset
 
 Details of the dataset can be found at https://developer.imdb.com/non-commercial-datasets/
 
-You can download the complete dataset as follows, these data files are in compressed
+You can download the 2 datasets we require as follows, these data files are in compressed
 format, so we uncompress them using the gunzip command at the end:
 
 ```bash
 wget https://datasets.imdbws.com/name.basics.tsv.gz
-wget https://datasets.imdbws.com/title.akas.tsv.gz
-wget https://datasets.imdbws.com/title.basics.tsv.gz
-wget https://datasets.imdbws.com/title.crew.tsv.gz
-wget https://datasets.imdbws.com/title.episode.tsv.gz
 wget https://datasets.imdbws.com/title.principals.tsv.gz
-wget https://datasets.imdbws.com/title.ratings.tsv.gz
 gunzip *.gz
+```
+
+Below are 2 versions of functions to outputs a list of dead workers after the year 2000:
+
+```python
+import pandas
+
+def process_py():
+    f = open('name.basics.tsv', 'r')
+    # Skip titles
+    f.readline()
+    i = 0
+    collected = []
+    for line in f:    
+        record = line.split('\t')
+        if record[2] != '\\N' and int(record[2]) > 2000 and record[3] != '\\N':
+            collected.append(record)
+    f.close()
+    return collected
+
+def process_pandas():
+    # Noticed here that we are using the chunksize argument, 
+    # which returns a list of dataframes insetad of one big individual dataframe
+    chunks = pandas.read_csv('name.basics.tsv', sep='\t', chunksize=5000)
+    collected = []
+    for df in chunks:
+        cleaned = df[ ['primaryName', 'birthYear', 'deathYear'] ].replace('\\N', None).dropna().astype( { 'birthYear': 'int', 'deathYear': 'int' })
+        filtered = cleaned[ cleaned['birthYear'] > 2000 ]
+        if not filtered.empty:
+            collected.append(filtered)
+    return pandas.concat(collected)
+```
+
+For all the exercises, do all the work in the file `main.py`
+
+## Special Note on running individual python functions
+
+If you want to run a function from a python file, I suggest use the `ipython` command instead of the
+normal `python` command, as `ipython` is designed to be interactive (similar to colab).
+
+Below is a typical ipython session where we try to call functions in the example.py file
+
+```bash
+$ ipython
+Python 3.12.1 (main, Sep 30 2024, 17:05:21) [GCC 9.4.0]
+Type 'copyright', 'credits' or 'license' for more information
+IPython 8.27.0 -- An enhanced Interactive Python. Type '?' for help.
+
+# The first 2 lines is to enable autoreload so if we can make changes to the source file 
+# without needing to restart ipython
+In [1]: %load_ext autoreload 
+In [2]: %autoreload 2 
+In [3]: import example # we import the example.py file as a module (no need to use the py extension)
+In [4]: example.process_py() # calling a function
+In [5]: example.process_pandas() # calling another function
 ```
 
 # Exercise 1
@@ -28,7 +78,9 @@ the entertainment industry.
 Write a python function to output the number of dead actors that were born
 after the year 2000.
 
-I want 2 versions: one using the csv module and the other using pandas.
+I want 2 versions: one using the csv module and the other using pandas with chunks.
+
+Name the two functions `count_dead_actors_csv()` and `count_dead_actors_pandas()`
 
 ## LESSON
 
@@ -54,6 +106,8 @@ def count_jobs():
 
     return set(jobs)
 ```
+
+Named the functions `count_jobs_csv()` and `count_jobs_pandas()`.
 
 # Exercise 3
 
@@ -135,6 +189,8 @@ def count_jobs_sql():
     return df
 
 ```
+
+Make sure you put `write_to_sqlite()` and `count_jobs_sql()` in `main.py`.
 
 # Exercise 4
 
