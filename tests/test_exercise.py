@@ -42,15 +42,15 @@ def test_count_dead_actors_pandas():
         assert result == 3  # Two actors born after 2000 with a death year
 
 # Test for count_jobs using mock data and pandas chunking
-def test_count_jobs_csv():
+def test_get_jobs_csv():
     with patch("builtins.open", mock_open(read_data=mock_title_principals_data)):
-        result = count_jobs_csv()
+        result = get_jobs_csv()
         assert result == {"director", "actor", "cinematographer", "composer"}
 
 # Test for count_jobs using mock data and pandas chunking
-def test_count_jobs_pandas():
+def test_get_jobs_pandas():
     with patch("builtins.open", mock_open(read_data=mock_title_principals_data)):
-        result = count_jobs_pandas()
+        result = get_jobs_pandas()
         assert result == {"director", "actor", "cinematographer", "composer"}
 
 # Fixture to mock file reading and set up an in-memory SQLite database
@@ -75,10 +75,10 @@ def test_write_to_sqlite(get_db_name):
         assert result == 5  # There are 5 entries in the mock title_principals_data
 
 # Test for count_jobs_sql using the setup fixture
-def test_count_jobs_sql(get_db_name):
+def test_get_jobs_sql(get_db_name):
     conn = sqlite3.connect(get_db_name)
     with patch("sqlite3.connect", return_value=conn):
-        result_df = count_jobs_sql()
-        assert set(result_df['category']) == {"director", "actor", "cinematographer", "composer"}
+        result = get_jobs_sql()
+        assert set(result) == {"director", "actor", "cinematographer", "composer"}
 
 

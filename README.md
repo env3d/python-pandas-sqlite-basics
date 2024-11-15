@@ -97,17 +97,17 @@ of the entertainment titles.  Write 2 python functions using the csv
 technique and the pandas technique to extract all the unique job categories.
 
 ```python
-def count_jobs():
+def get_jobs_pandas():
     chunks = pd.read_csv('title.principals.tsv', delimiter='\t', chunksize=50000)
 
     jobs = []
     for df in chunks:
         jobs = jobs + list(df['category'].unique())
 
-    return set(jobs)
+    return list(set(jobs))
 ```
 
-Named the functions `count_jobs_csv()` and `count_jobs_pandas()`.
+Named the functions `get_jobs_csv()` and `get_jobs_pandas()`.
 
 # Exercise 3
 
@@ -183,7 +183,7 @@ archive_sound
 We can actually execute SQL from pandas, like this:
 
 ```python
-def count_jobs_sql():
+def get_jobs_sql():
     conn = sqlite3.connect('imdb.db')
     df = pd.read_sql('select distinct(category) from principals', conn)
     return df
