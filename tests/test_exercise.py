@@ -89,7 +89,8 @@ def test_write_to_sqlite(setup_sqlite):
 # Test for count_jobs_sql using the setup fixture
 def test_count_jobs_sql(setup_sqlite):
     conn = setup_sqlite
-    result_df = count_jobs_sql()
-    assert set(result_df['category']) == {"director", "actor", "cinematographer", "composer"}
+    with patch("sqlite3.connect", return_value=conn):
+        result_df = count_jobs_sql()
+        assert set(result_df['category']) == {"director", "actor", "cinematographer", "composer"}
 
 
