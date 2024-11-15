@@ -185,12 +185,13 @@ We can actually execute SQL from pandas, like this:
 ```python
 def get_jobs_sql():
     conn = sqlite3.connect('imdb.db')
-    df = pd.read_sql('select distinct(category) from principals', conn)
-    return df
+    df = pd.read_sql('SELECT DISTINCT category FROM principals', conn)
+    conn.close()
+    return df['category'].unique()
 
 ```
 
-Make sure you put `write_to_sqlite()` and `count_jobs_sql()` in `main.py`.
+Make sure you put `write_to_sqlite()` and `get_jobs_sql()` in `main.py`.
 
 # Exercise 4
 
