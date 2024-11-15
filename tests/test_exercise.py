@@ -55,40 +55,28 @@ def test_count_jobs_pandas():
 
 # Fixture to mock file reading and set up an in-memory SQLite database
 @pytest.fixture(scope="module")
-def setup_sqlite():
-    with patch("builtins.open", mock_open()) as mock_file:
-        # Provide the correct data when each file is opened
-        mock_file.side_effect = [
-            io.StringIO(mock_name_basics_data),
-            io.StringIO(mock_title_principals_data),
-        ]
+def get_db_name():
+    yield "_imdb_.db"
+    os.remove("_imdb_.db")
 
-        # Set up an in-memory SQLite database
-        conn = sqlite3.connect(":memory:")
-
-        # Load the title.principals data into the in-memory database
-        title_principals_df = pd.read_csv(io.StringIO(mock_title_principals_data), delimiter="\t")
-        title_principals_df.to_sql("principals", conn, index=False, if_exists="replace")
-
-        yield conn
-
-        conn.close()
 
 # Test for write_to_sqlite using the setup fixture
-def test_write_to_sqlite(setup_sqlite):
-    conn = setup_sqlite
+def test_write_to_sqlite(get_db_name):
+    conn = sqlite3.connect(get_db_name)
     with patch("builtins.open", mock_open(read_data=mock_title_principals_data)):
-        write_to_sqlite()  # Writes data to the in-memory SQLite db
+        with patch("sqlite3.connect", return_value=conn):
+            write_to_sqlite()  # Writes data to the in-memory SQLite db
 
         # Verify the data was written correctly
-        cursor = conn.cursor()
+        conn2 = sqlite3.connect(get_db_name)
+        cursor = conn2.cursor()
         cursor.execute("SELECT COUNT(*) FROM principals")
         result = cursor.fetchone()[0]
         assert result == 5  # There are 5 entries in the mock title_principals_data
 
 # Test for count_jobs_sql using the setup fixture
-def test_count_jobs_sql(setup_sqlite):
-    conn = setup_sqlite
+def test_count_jobs_sql(get_db_name):
+    conn = sqlite3.connect(get_db_name)
     with patch("sqlite3.connect", return_value=conn):
         result_df = count_jobs_sql()
         assert set(result_df['category']) == {"director", "actor", "cinematographer", "composer"}
